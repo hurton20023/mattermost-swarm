@@ -29,7 +29,7 @@ services:
       - MM_BLEVESETTINGS_INDEXDIR=${MATTERMOST_BLEVE_INDEXES_PATH}
     ports:
       - target: 8065
-        published: ${APP_PORT}
+        published: 31201
         protocol: tcp
         mode: ingress
     volumes:
@@ -57,25 +57,25 @@ services:
       - --lt-cred-mech
       - --fingerprint
       - --no-stdout-log
-      - --listening-port=${TURN_PORT}
-      - --min-port=${TURN_MIN_PORT}
-      - --max-port=${TURN_MAX_PORT}
+      - --listening-port=3478
+      - --min-port=31202
+      - --max-port=31252
       - --realm=${TURN_REALM}
       - --user=${TURN_USER}:${TURN_PASSWORD}
       - --external-ip=${TURN_EXTERNAL_IP}
     ports:
       # STUN/TURN Ports in host mode for media traffic efficiency
       - target: ${TURN_PORT}
-        published: ${TURN_PORT}
+        published: 3478
         protocol: tcp
         mode: host
       - target: ${TURN_PORT}
-        published: ${TURN_PORT}
+        published: 3478
         protocol: udp
         mode: host
       # Relay port range (must be host mode for UDP relay to work correctly in Swarm)
       - target: ${TURN_MIN_PORT}-${TURN_MAX_PORT}
-        published: ${TURN_MIN_PORT}-${TURN_MAX_PORT}
+        published: 31202-31252
         protocol: udp
         mode: host
     deploy:
