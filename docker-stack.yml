@@ -74,7 +74,7 @@ services:
     environment:
       - TZ=UTC
     command:
-      - -n
+      - --n
       - --log-file=stdout
       - --lt-cred-mech
       - --fingerprint
@@ -85,6 +85,9 @@ services:
       - --realm=192.168.1.154
       - --user=mmuser:mmuser_turn_password_change_me
       - --external-ip=192.168.1.154
+      - --listening-ip=0.0.0.0
+      - --relay-ip=192.168.1.154
+      - --verbose
     networks:
       - mattermost-net
     ports:
