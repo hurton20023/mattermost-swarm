@@ -73,10 +73,6 @@ services:
     image: coturn/coturn:latest
     environment:
       - TZ=UTC
-  coturn:
-    image: coturn/coturn:latest
-    environment:
-      - TZ=UTC
     command:
       - -n
       - --log-file=stdout
