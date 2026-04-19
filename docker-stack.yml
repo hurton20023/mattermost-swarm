@@ -17,6 +17,8 @@ services:
       - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
       - ./traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
       - ./traefik/certs:/etc/traefik/certs:ro
+    networks:
+      - mattermost-net
     deploy:
       placement:
         constraints:
@@ -33,6 +35,8 @@ services:
       - TZ=UTC
     volumes:
       - ./volumes/db/data:/var/lib/postgresql/data
+    networks:
+      - mattermost-net
     deploy:
       restart_policy:
         condition: on-failure
@@ -50,7 +54,8 @@ services:
       - MM_SQLSETTINGS_DATASOURCE=postgres://mmuser:most-secret-password-change-me@db:5432/mattermost?sslmode=disable&connect_timeout=10
       - MM_SERVICESETTINGS_SITEURL=https://192.168.1.154
       - MM_BLEVESETTINGS_INDEXDIR=/mattermost/bleve-indexes
-    # No ports here, handled by Traefik
+    networks:
+      - mattermost-net
     volumes:
       - ./volumes/app/config:/mattermost/config:rw
       - ./volumes/app/data:/mattermost/data:rw
@@ -62,6 +67,7 @@ services:
       replicas: 1
       labels:
         - "traefik.enable=true"
+        - "traefik.docker.network=mattermost_mattermost-net"
         - "traefik.http.routers.mattermost.rule=Host(`192.168.1.154`)"
         - "traefik.http.routers.mattermost.entrypoints=websecure"
         - "traefik.http.routers.mattermost.tls=true"
@@ -88,8 +94,10 @@ services:
       - --realm=192.168.1.154
       - --user=mmuser:mmuser_turn_password_change_me
       - --external-ip=192.168.1.154
+    networks:
+      - mattermost-net
     ports:
-      # STUN/TURN Ports remain published directly (Host mode)
+      # STUN/TURN Ports remain published directly (Host mode bypasses proxy)
       - target: 3478
         published: 3478
         protocol: tcp
@@ -126,3 +134,8 @@ services:
       placement:
         constraints:
           - node.role == manager
+
+networks:
+  mattermost-net:
+    driver: overlay
+    attachable: true
