@@ -1,8 +1,8 @@
 version: "3.8"
 
 services:
-  traefik:
-    image: traefik:v2.10
+  nginx:
+    image: nginx:alpine
     ports:
       - target: 80
         published: 80
@@ -13,10 +13,8 @@ services:
         protocol: tcp
         mode: ingress
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
-      - ./traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
-      - ./traefik/certs:/etc/traefik/certs:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro # Using the correct cert folder
     networks:
       - mattermost-net
     deploy:
@@ -65,13 +63,6 @@ services:
       - ./volumes/app/bleve-indexes:/mattermost/bleve-indexes:rw
     deploy:
       replicas: 1
-      labels:
-        - "traefik.enable=true"
-        - "traefik.docker.network=mattermost_mattermost-net"
-        - "traefik.http.routers.mattermost.rule=Host(`192.168.1.154`)"
-        - "traefik.http.routers.mattermost.entrypoints=websecure"
-        - "traefik.http.routers.mattermost.tls=true"
-        - "traefik.http.services.mattermost.loadbalancer.server.port=8065"
       restart_policy:
         condition: on-failure
       placement:

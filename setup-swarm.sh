@@ -16,7 +16,7 @@ echo "Waiting for stack cleanup..."
 sleep 20
 
 # 1. Create directory structure and set permissions
-echo "Ensuring volumes directory structure..."
+echo "Ensuring volumes and nginx directory structure..."
 mkdir -p "$PROJECT_DIR/volumes/db/data"
 mkdir -p "$PROJECT_DIR/volumes/app/config"
 mkdir -p "$PROJECT_DIR/volumes/app/data"
@@ -24,6 +24,7 @@ mkdir -p "$PROJECT_DIR/volumes/app/logs"
 mkdir -p "$PROJECT_DIR/volumes/app/plugins"
 mkdir -p "$PROJECT_DIR/volumes/app/client/plugins"
 mkdir -p "$PROJECT_DIR/volumes/app/bleve-indexes"
+mkdir -p "$PROJECT_DIR/nginx/certs"
 
 echo "Setting permissions..."
 sudo chown -R 2000:2000 "$PROJECT_DIR/volumes/app"

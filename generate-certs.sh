@@ -3,7 +3,7 @@
 
 set -e
 
-CERT_DIR="$HOME/mattermost-swarm/traefik/certs"
+CERT_DIR="$HOME/mattermost-swarm/nginx/certs"
 IP="192.168.1.154"
 
 mkdir -p "$CERT_DIR"
