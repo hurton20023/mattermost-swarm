@@ -73,8 +73,12 @@ services:
     image: coturn/coturn:latest
     environment:
       - TZ=UTC
+  coturn:
+    image: coturn/coturn:latest
+    environment:
+      - TZ=UTC
     command:
-      - --n
+      - -n
       - --log-file=stdout
       - --lt-cred-mech
       - --fingerprint
