@@ -2,11 +2,11 @@ import asyncio
 import logging
 from aiortc import RTCPeerConnection, RTCIceServer, RTCConfiguration
 
-# --- CONFIGURATION ---
-TURN_URL = "turn:192.168.1.154:3478"
+# --- CONFIGURATION (Must match docker-stack.yml) ---
+TURN_URL  = "turn:192.168.1.154:3478?transport=udp"
 TURN_USER = "mmuser"
 TURN_PASS = "mmuser_turn_password_change_me"
-# ---------------------
+# --------------------------------------------------
 
 async def test_turn():
     # Setup the ICE Server configuration
@@ -23,20 +23,22 @@ async def test_turn():
     # We need to create a data channel to trigger ICE gathering
     pc.createDataChannel("test-channel")
 
-    print(f"--- Testing TURN Server: {TURN_URL} ---")
-    print("Gathering ICE candidates... (Wait ~10 seconds)")
+    print(f"--- Attempting to find TURN Relay Candidate on: {TURN_URL} ---")
 
     try:
         # Create an offer to start ICE gathering
         offer = await pc.createOffer()
         await pc.setLocalDescription(offer)
 
-        # Wait for gathering to complete or find a 'relay' candidate
         found_relay = False
-        for i in range(20): # Timeout after 20 seconds
-            for candidate in pc.localDescription.sdp.split('\n'):
-                if 'typ relay' in candidate:
-                    print(f"\n✅ SUCCESS! Found Relay Candidate: {candidate.strip()}")
+        print("Gathering candidates...")
+        
+        # Wait up to 15 seconds
+        for i in range(15):
+            sdp = pc.localDescription.sdp
+            for line in sdp.split('\n'):
+                if 'typ relay' in line:
+                    print(f"\n✅ SUCCESS! TURN relay candidate found:\n   {line.strip()}")
                     found_relay = True
                     break
             if found_relay:
@@ -44,8 +46,8 @@ async def test_turn():
             await asyncio.sleep(1)
 
         if not found_relay:
-            print("\n❌ FAILED: No 'relay' candidates found. Your TURN server is not reachable or auth failed.")
-            print("Check your firewall (UDP 3478) and CoTURN logs.")
+            print("\n❌ FAILED: No relay candidate found.")
+            print("Check CoTURN logs for 'Unauthorized' or 'Wrong credentials' errors.")
 
     except Exception as e:
         print(f"\n❌ ERROR: {e}")
@@ -53,5 +55,7 @@ async def test_turn():
         await pc.close()
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.ERROR)
+    # We turn up the logging for aioice to see exactly what's failing
+    # This will help us see the raw STUN messages if it fails
+    logging.basicConfig(level=logging.INFO)
     asyncio.run(test_turn())
