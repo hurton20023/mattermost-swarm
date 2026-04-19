@@ -59,7 +59,7 @@ services:
       - --no-stdout-log
       - --listening-port=3478
       - --min-port=31202
-      - --max-port=31252
+      - --max-port=31206
       - --realm=${TURN_REALM}
       - --user=${TURN_USER}:${TURN_PASSWORD}
       - --external-ip=${TURN_EXTERNAL_IP}
@@ -74,8 +74,24 @@ services:
         protocol: udp
         mode: host
       # Relay port range (must be host mode for UDP relay to work correctly in Swarm)
-      - target: 31202-31252
-        published: 31202-31252
+      - target: 31202
+        published: 31202
+        protocol: udp
+        mode: host
+      - target: 31203
+        published: 31203
+        protocol: udp
+        mode: host
+      - target: 31204
+        published: 31204
+        protocol: udp
+        mode: host
+      - target: 31205
+        published: 31205
+        protocol: udp
+        mode: host
+      - target: 31206
+        published: 31206
         protocol: udp
         mode: host
     deploy:
