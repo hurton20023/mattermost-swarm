@@ -65,16 +65,16 @@ services:
       - --external-ip=${TURN_EXTERNAL_IP}
     ports:
       # STUN/TURN Ports in host mode for media traffic efficiency
-      - target: ${TURN_PORT}
+      - target: 3478
         published: 3478
         protocol: tcp
         mode: host
-      - target: ${TURN_PORT}
+      - target: 3478
         published: 3478
         protocol: udp
         mode: host
       # Relay port range (must be host mode for UDP relay to work correctly in Swarm)
-      - target: ${TURN_MIN_PORT}-${TURN_MAX_PORT}
+      - target: 31202-31252
         published: 31202-31252
         protocol: udp
         mode: host
