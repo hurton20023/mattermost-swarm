@@ -41,3 +41,21 @@ sudo docker stack deploy -c "$PROJECT_DIR/docker-stack.yml" mattermost
 
 echo "--- Re-Setup Complete ---"
 echo "Check your deployment with: sudo docker service ls"
+echo ""
+echo "--- Mattermost Calls ICE Servers Configuration ---"
+echo "Paste this into System Console > Plugins > Calls > ICE Servers:"
+echo ""
+echo '[
+  {
+    "urls": ["stun:192.168.1.154:3478"]
+  },
+  {
+    "urls": [
+      "turn:192.168.1.154:3478?transport=udp",
+      "turn:192.168.1.154:3478?transport=tcp"
+    ],
+    "username": "mmuser",
+    "credential": "mmuser_turn_password_change_me"
+  }
+]'
+echo ""
