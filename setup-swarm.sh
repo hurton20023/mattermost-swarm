@@ -25,6 +25,7 @@ mkdir -p "$PROJECT_DIR/volumes/app/plugins"
 mkdir -p "$PROJECT_DIR/volumes/app/client/plugins"
 mkdir -p "$PROJECT_DIR/volumes/app/bleve-indexes"
 mkdir -p "$PROJECT_DIR/nginx/certs"
+mkdir -p "$PROJECT_DIR/coturn"
 
 echo "Setting permissions..."
 sudo chown -R 2000:2000 "$PROJECT_DIR/volumes/app"

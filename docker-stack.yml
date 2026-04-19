@@ -73,7 +73,9 @@ services:
     image: coturn/coturn:latest
     environment:
       - TZ=UTC
-    command: -n --log-file=stdout --lt-cred-mech --fingerprint --no-stdout-log --listening-port=3478 --min-port=31202 --max-port=31206 --realm=192.168.1.154 --user=mmuser:mmuser_turn_password_change_me --external-ip=192.168.1.154 --listening-ip=0.0.0.0 --relay-ip=192.168.1.154
+    volumes:
+      - ./coturn/turnserver.conf:/etc/turnserver.conf:ro
+    command: -c /etc/turnserver.conf
     networks:
       - mattermost-net
     ports:
