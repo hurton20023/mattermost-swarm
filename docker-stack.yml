@@ -2,43 +2,43 @@ version: "3.8"
 
 services:
   db:
-    image: postgres:${POSTGRES_IMAGE_TAG}
+    image: postgres:13-alpine
     environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - TZ=${TZ}
+      - POSTGRES_USER=mmuser
+      - POSTGRES_PASSWORD=most-secret-password-change-me
+      - POSTGRES_DB=mattermost
+      - TZ=UTC
     volumes:
-      - ${POSTGRES_DATA_PATH}:/var/lib/postgresql/data
+      - ./volumes/db/data:/var/lib/postgresql/data
     deploy:
       restart_policy:
         condition: on-failure
       placement:
         constraints:
-          - node.role == manager  # Standard practice for single-node DB, adjust as needed
+          - node.role == manager
 
   mattermost:
-    image: mattermost/${MATTERMOST_IMAGE}:${MATTERMOST_IMAGE_TAG}
+    image: mattermost/mattermost-team-edition:9.5.2
     depends_on:
       - db
     environment:
-      - TZ=${TZ}
-      - MM_SQLSETTINGS_DRIVERNAME=${MM_SQLSETTINGS_DRIVERNAME}
-      - MM_SQLSETTINGS_DATASOURCE=${MM_SQLSETTINGS_DATASOURCE}
-      - MM_SERVICESETTINGS_SITEURL=${MM_SERVICESETTINGS_SITEURL}
-      - MM_BLEVESETTINGS_INDEXDIR=${MATTERMOST_BLEVE_INDEXES_PATH}
+      - TZ=UTC
+      - MM_SQLSETTINGS_DRIVERNAME=postgres
+      - MM_SQLSETTINGS_DATASOURCE=postgres://mmuser:most-secret-password-change-me@db:5432/mattermost?sslmode=disable&connect_timeout=10
+      - MM_SERVICESETTINGS_SITEURL=http://192.168.1.154:31201
+      - MM_BLEVESETTINGS_INDEXDIR=/mattermost/bleve-indexes
     ports:
       - target: 8065
         published: 31201
         protocol: tcp
         mode: ingress
     volumes:
-      - ${MATTERMOST_CONFIG_PATH}:/mattermost/config:rw
-      - ${MATTERMOST_DATA_PATH}:/mattermost/data:rw
-      - ${MATTERMOST_LOGS_PATH}:/mattermost/logs:rw
-      - ${MATTERMOST_PLUGINS_PATH}:/mattermost/plugins:rw
-      - ${MATTERMOST_CLIENT_PLUGINS_PATH}:/mattermost/client/plugins:rw
-      - ${MATTERMOST_BLEVE_INDEXES_PATH}:/mattermost/bleve-indexes:rw
+      - ./volumes/app/config:/mattermost/config:rw
+      - ./volumes/app/data:/mattermost/data:rw
+      - ./volumes/app/logs:/mattermost/logs:rw
+      - ./volumes/app/plugins:/mattermost/plugins:rw
+      - ./volumes/app/client/plugins:/mattermost/client/plugins:rw
+      - ./volumes/app/bleve-indexes:/mattermost/bleve-indexes:rw
     deploy:
       replicas: 1
       restart_policy:
@@ -50,7 +50,7 @@ services:
   coturn:
     image: coturn/coturn:latest
     environment:
-      - TZ=${TZ}
+      - TZ=UTC
     command:
       - -n
       - --log-file=stdout
@@ -60,11 +60,11 @@ services:
       - --listening-port=3478
       - --min-port=31202
       - --max-port=31206
-      - --realm=${TURN_REALM}
-      - --user=${TURN_USER}:${TURN_PASSWORD}
-      - --external-ip=${TURN_EXTERNAL_IP}
+      - --realm=192.168.1.154
+      - --user=mmuser:mmuser_turn_password_change_me
+      - --external-ip=192.168.1.154
     ports:
-      # STUN/TURN Ports in host mode for media traffic efficiency
+      # STUN/TURN Ports in host mode for media traffic efficiency (Manual individual listing for swarm)
       - target: 3478
         published: 3478
         protocol: tcp
@@ -73,7 +73,7 @@ services:
         published: 3478
         protocol: udp
         mode: host
-      # Relay port range (must be host mode for UDP relay to work correctly in Swarm)
+      # Relay port range (must be host mode and individual for Swarm)
       - target: 31202
         published: 31202
         protocol: udp
