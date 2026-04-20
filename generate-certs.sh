@@ -4,7 +4,7 @@
 set -e
 
 CERT_DIR="$HOME/mattermost-swarm/nginx/certs"
-IP="192.168.1.154"
+IP="10.100.6.146"
 
 mkdir -p "$CERT_DIR"
 
