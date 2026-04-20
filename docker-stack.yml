@@ -50,7 +50,7 @@ services:
       - TZ=UTC
       - MM_SQLSETTINGS_DRIVERNAME=postgres
       - MM_SQLSETTINGS_DATASOURCE=postgres://mmuser:most-secret-password-change-me@db:5432/mattermost?sslmode=disable&connect_timeout=10
-      - MM_SERVICESETTINGS_SITEURL=https://192.168.1.146
+      - MM_SERVICESETTINGS_SITEURL=https://10.100.6.146
       - MM_BLEVESETTINGS_INDEXDIR=/mattermost/bleve-indexes
     networks:
       - mattermost-net
